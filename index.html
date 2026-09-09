@@ -369,7 +369,21 @@
         // 初始页面时，填充外被下拉框
         document.getElementById('jack_mat').innerHTML = getMaterialOptionsHTML('TPU');
         addCoreBlock(); 
+        updateResultHeaders('round');
     };
+
+    // 根据线材类型同步结果表头，保证计算前后字段名一致
+    function updateResultHeaders(shape) {
+        const cabD = document.getElementById('th_cab_d');
+        const finalD = document.getElementById('th_final_d');
+        if (shape === 'flat') {
+            cabD.innerText = "内部排线宽×厚(mm)";
+            finalD.innerText = "成品扁线宽×厚(mm)";
+        } else {
+            cabD.innerText = "成缆外径评估(mm)";
+            finalD.innerText = "成品圆线外径(mm)";
+        }
+    }
 
     function toggleShapeSettings() {
         const shape = document.getElementById('cable_shape').value;
@@ -382,6 +396,7 @@
             layContainer.style.display = 'flex';
             spacingContainer.style.display = 'none';
         }
+        updateResultHeaders(shape);
     }
 
     function addCoreBlock() {
@@ -508,8 +523,7 @@
         let finalStr = '', baseStr = '', weightJackKg = 0, layCable = '-';
 
         if (shape === 'round') {
-            document.getElementById('th_cab_d').innerText = "成缆外径评估(mm)";
-            document.getElementById('th_final_d').innerText = "成品圆线外径(mm)";
+            updateResultHeaders('round');
             
             let d_eff = Math.sqrt(sumD2_times_N / totalCoresN);
             let k = (totalCoresN <= 10) ? CABLING_FACTOR[totalCoresN] : 1.15 * Math.sqrt(totalCoresN);
@@ -528,8 +542,7 @@
             exportData.layCable = layCable;
 
         } else if (shape === 'flat') {
-            document.getElementById('th_cab_d').innerText = "内部排线宽×厚(mm)";
-            document.getElementById('th_final_d').innerText = "成品扁线宽×厚(mm)";
+            updateResultHeaders('flat');
             
             let spacing = parseFloat(document.getElementById('flat_spacing').value) || 0;
             let totalGapsWidth = totalCoresN > 1 ? (totalCoresN - 1) * spacing : 0;
