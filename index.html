@@ -96,6 +96,13 @@
         @media (max-width: 1000px) {
             .core-input-row { gap: 10px; }
             .core-input-row .input-item { min-width: 0; }
+            /* 移动端折行后隐藏分隔竖线，避免错位 */
+            .input-item-sep { border-left: none; padding-left: 0; }
+        }
+        /* 桌面宽屏：末列(芯线数量)左侧分隔竖线 */
+        .input-item-sep {
+            border-left: 2px solid #cbd5e0;
+            padding-left: 10px;
         }
 
         .input-item { display: flex; flex-direction: column; gap: 6px; }
@@ -388,7 +395,7 @@
                         ${getMaterialOptionsHTML('TPEE')}
                     </select>
                 </div>
-                <div class="input-item" style="border-left: 2px solid #cbd5e0; padding-left: 10px;">
+                <div class="input-item input-item-sep">
                     <label style="color: #2b6cb0;">芯线数量</label>
                     <input type="number" class="core-qty" step="1" value="1" min="1">
                 </div>
