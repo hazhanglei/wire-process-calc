@@ -164,17 +164,17 @@
 
     <!-- 2. 外被与成缆参数区 -->
     <div class="card">
-        <h3 class="module-title">成品外观与包胶参数</h3>
+        <h3 class="module-title">线材成品参数</h3>
         <div class="input-grid">
             <div class="input-item" style="border-right: 2px dashed #cbd5e0; padding-right: 15px;">
-                <label style="color: #e53e3e;">线材外观形状</label>
+                <label style="color: #e53e3e;">线材类型</label>
                 <select id="cable_shape" onchange="toggleShapeSettings()" style="font-weight: bold;">
-                    <option value="round">圆形线 (圆整绞合)</option>
-                    <option value="flat">扁平线 (跑道型并排)</option>
+                    <option value="round">圆线</option>
+                    <option value="flat">扁线</option>
                 </select>
             </div>
             <div class="input-item">
-                <label>外被包胶厚度 (mm)</label>
+                <label>外包胶(单边) (mm)</label>
                 <input type="number" id="jack_thick" step="0.01" value="0.4">
             </div>
             <div class="input-item">
@@ -182,7 +182,7 @@
                 <select id="jack_mat"></select>
             </div>
             <div class="input-item">
-                <label>外被填充(补强丝)</label>
+                <label>补强丝</label>
                 <input type="text" id="jack_filler" placeholder="例: 1000D Kailev">
             </div>
             <div class="input-item" id="lay_mult_container">
