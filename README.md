@@ -1,7 +1,7 @@
-# 线材工艺计算工具（Wire Process Calculator）
+# 线材工艺计算工具-v1.0（Wire Process Calculator）
 
 > **线上访问**：https://hazhanglei.github.io/wire-process-calc/  
-> **版本**：工程表单导出版 V16  
+> **版本**：v1.0  
 > **最后更新**：2026-09-09
 
 ---
@@ -266,15 +266,36 @@ layCable = "平行不绞"
 - 单文件 HTML（内联 CSS + JS，无外部依赖，可直接离线使用）
 - GitHub Pages 部署，每次 push 自动触发 Actions 构建
 - 胶料参数通过 `localStorage` 持久化，无需后端
+- 支持 PWA 安装：`manifest.json` 提供应用元数据与图标，浏览器可"安装为应用"
 
 ### 目录结构
 
 ```
 wire-process-calc/
 ├── index.html          # 工具主文件
+├── manifest.json       # PWA 清单（应用名/图标/主题色）
+├── icon-192.png        # PWA 图标 192px
+├── icon-512.png        # PWA 图标 512px（含 maskable）
+├── favicon.ico         # 浏览器标签图标（多尺寸）
+├── favicon.png         # 现代浏览器 favicon（32px）
+├── make_icons.py       # 图标生成脚本（PIL 重跑）
+├── deploy.bat          # 一键部署脚本（双击 → 提交 → 推送 → Pages 自动构建）
 ├── .github/workflows/pages.yml  # GitHub Pages 自动部署
 └── README.md
 ```
+
+### 本地开发与部署
+
+源码仓库路径（英文目录，避免 Windows 批处理中文编码问题）：
+`E:\default\Projects\wire-process-calc`
+
+日常维护：直接编辑仓库内 `index.html` → 双击 `deploy.bat` → 自动提交推送并触发 Pages 构建。
+
+### 安装为桌面 / 手机应用（PWA）
+
+1. 浏览器打开线上地址
+2. 地址栏会出现"安装"图标（桌面 Chrome/Edge，或手机端"添加到主屏幕"）
+3. 安装后应用名显示"线材计算"，图标为线材横截面图标
 
 ---
 
@@ -298,5 +319,4 @@ A：不限。CABLING_FACTOR 数组仅覆盖 10 芯以内，超出部分用公式
 
 | 日期 | 变更 |
 |------|------|
-| 2026-09-09 | 移动端自适应折行修复；文件改名 index.html；部署至 GitHub Pages |
-| V16 | 工程表单导出版（当前版本） |
+| 2026-09-09 | 改名为 v1.0；新增 PWA 图标体系（manifest + favicon + 192/512）；目录迁移至英文路径 `E:\default\`；移动端自适应折行修复；上线 GitHub Pages |
