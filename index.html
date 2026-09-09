@@ -81,13 +81,13 @@
         }
         .core-input-row {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 12px;
-            align-items: flex-end; 
+            align-items: flex-end;
         }
         @media (max-width: 1000px) {
-            .core-input-row { overflow-x: auto; padding-bottom: 5px; }
-            .core-input-row .input-item { min-width: 130px; }
+            .core-input-row { gap: 10px; }
+            .core-input-row .input-item { min-width: 0; }
         }
 
         .input-item { display: flex; flex-direction: column; gap: 6px; }
