@@ -94,7 +94,7 @@
             align-items: flex-end;
         }
         @media (max-width: 1000px) {
-            .core-input-row { gap: 10px; }
+            .core-input-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .core-input-row .input-item { min-width: 0; }
             /* 移动端折行后隐藏分隔竖线，避免错位 */
             .input-item-sep { border-left: none; padding-left: 0; }
