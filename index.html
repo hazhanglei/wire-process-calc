@@ -180,8 +180,8 @@
             <div class="input-item" style="border-right: 2px dashed #cbd5e0; padding-right: 15px;">
                 <label style="color: #e53e3e;">线材外观形状</label>
                 <select id="cable_shape" onchange="toggleShapeSettings()" style="font-weight: bold;">
-                    <option value="round">圆形线 (圆整绞合)</option>
-                    <option value="flat">扁平线 (跑道型并排)</option>
+                    <option value="round">圆线</option>
+                    <option value="flat">扁线</option>
                 </select>
             </div>
             <div class="input-item">
@@ -397,11 +397,11 @@
                 ${coreIndex > 1 ? `<button class="btn-small" onclick="document.getElementById('core_block_${coreIndex}').remove()">删除该规格</button>` : ''}
             </div>
             <div class="core-input-row">
-                <div class="input-item"><label>单根铜直径(mm)</label><input type="number" class="core-cu-d" step="0.001"></div>
-                <div class="input-item"><label>铜丝股数(N)</label><input type="number" class="core-cu-n" step="1"></div>
+                <div class="input-item"><label>铜直径(mm)</label><input type="number" class="core-cu-d" step="0.001"></div>
+                <div class="input-item"><label>股数(N)</label><input type="number" class="core-cu-n" step="1"></div>
                 <div class="input-item"><label>补强丝(Denier)</label><input type="number" class="core-yarn-d" step="1" value="0"></div>
-                <div class="input-item"><label>芯线绞距倍数</label><input type="number" class="core-lay-mult" step="0.1" value="8"></div>
-                <div class="input-item"><label>绝缘厚度(mm)</label><input type="number" class="core-ins-thick" step="0.01" value="0.25"></div>
+                <div class="input-item"><label>绞距倍数</label><input type="number" class="core-lay-mult" step="0.1" value="8"></div>
+                <div class="input-item"><label>胶厚(mm)</label><input type="number" class="core-ins-thick" step="0.01" value="0.25"></div>
                 <div class="input-item">
                     <label>绝缘材质</label>
                     <select class="core-ins-mat">
