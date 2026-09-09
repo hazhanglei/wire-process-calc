@@ -500,7 +500,7 @@
                 <tr>
                     <td><strong>${specName}</strong></td><td>${qty}</td><td>${condOD.toFixed(3)}</td>
                     <td style="color: #2b6cb0;">${coreOD.toFixed(3)}</td><td>${layCond.toFixed(1)}</td>
-                    <td>${weightCuKg.toFixed(4)}</td><td>${weightInsKg.toFixed(4)}</td><td>${(weightInsKg * qty).toFixed(4)}</td>
+                    <td>${weightCuKg.toFixed(6)}</td><td>${weightInsKg.toFixed(4)}</td><td>${(weightInsKg * qty).toFixed(4)}</td>
                 </tr>
             `;
 
@@ -567,7 +567,7 @@
         document.getElementById('res_cab_d').innerText = baseStr;
         document.getElementById('res_final_d').innerText = finalStr;
         document.getElementById('res_cab_lay').innerText = layCable;
-        document.getElementById('res_total_cu').innerText = totalCuWeightKg.toFixed(4);
+        document.getElementById('res_total_cu').innerText = totalCuWeightKg.toFixed(6);
         document.getElementById('res_jack_w').innerText = weightJackKg.toFixed(4);
 
         window.lastCalcData = exportData;
