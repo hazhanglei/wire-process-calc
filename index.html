@@ -91,9 +91,31 @@
             gap: 12px;
             align-items: flex-end; 
         }
+        /* 末列(芯线数量)左侧分隔竖线 */
+        .input-item-sep {
+            border-left: 2px solid #cbd5e0;
+            padding-left: 10px;
+        }
         @media (max-width: 1000px) {
             .core-input-row { overflow-x: auto; padding-bottom: 5px; }
             .core-input-row .input-item { min-width: 130px; }
+        }
+        /* 手机：铺满屏幕、无黑边、无横向滚动 */
+        @media (max-width: 768px) {
+            body { padding: 0; background-color: #f2f3f5; }
+            .container { padding: 10px; margin: 0; border-radius: 0; background: transparent; }
+            .card { padding: 12px; }
+            .core-input-row {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 8px;
+                overflow-x: visible;
+                padding-bottom: 0;
+            }
+            .core-input-row .input-item { min-width: 0; }
+            .core-input-row .input-item label { font-size: 0.72rem; }
+            .core-input-row .input-item input,
+            .core-input-row .input-item select { font-size: 0.9rem; padding: 6px 5px; }
+            .input-item-sep { border-left: none; padding-left: 0; }
         }
 
         .input-item { display: flex; flex-direction: column; gap: 6px; }
@@ -386,7 +408,7 @@
                         ${getMaterialOptionsHTML('TPEE')}
                     </select>
                 </div>
-                <div class="input-item" style="border-left: 2px solid #cbd5e0; padding-left: 10px;">
+                <div class="input-item input-item-sep">
                     <label style="color: #2b6cb0;">芯线数量</label>
                     <input type="number" class="core-qty" step="1" value="1" min="1">
                 </div>
