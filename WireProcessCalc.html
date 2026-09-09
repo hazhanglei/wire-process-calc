@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>线材工艺计算工具 - 工程表单导出版 V16</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', "Microsoft YaHei", sans-serif;
+            background-color: #3b3b3b;
+            margin: 0;
+            padding: 30px 15px;
+            color: #333;
+        }
+        .container {
+            max-width: 1150px;
+            margin: 0 auto;
+            background-color: #f2f3f5;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            border: 1px solid #eef0f2;
+        }
+        .module-title {
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #2c3e50;
+            border-left: 4px solid #3b71a7;
+            padding-left: 10px;
+            margin-bottom: 15px;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+        }
+        .core-block {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .core-header {
+            font-weight: bold;
+            color: #2b6cb0;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #cbd5e0;
+            padding-bottom: 8px;
+        }
+        .btn-small {
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .btn-add-core {
+            background-color: #4a5568;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        .btn-add-core:hover { background-color: #2d3748; }
+        
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+        }
+        .core-input-row {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 12px;
+            align-items: flex-end; 
+        }
+        @media (max-width: 1000px) {
+            .core-input-row { overflow-x: auto; padding-bottom: 5px; }
+            .core-input-row .input-item { min-width: 130px; }
+        }
+
+        .input-item { display: flex; flex-direction: column; gap: 6px; }
+        .input-item label { font-size: 0.8rem; font-weight: 600; color: #4a5568; white-space: nowrap; }
+        .input-item input, .input-item select {
+            padding: 8px 8px; border: 1px solid #dcdfe6; border-radius: 4px; font-size: 0.95rem;
+            width: 100%; box-sizing: border-box;
+        }
+        .input-item input:focus, .input-item select:focus {
+            border-color: #3b71a7; outline: none; background-color: #ebf8ff;
+        }
+        .action-bar {
+            display: flex; justify-content: center; gap: 15px; padding: 15px; flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 24px; font-size: 1rem; font-weight: bold; color: #fff;
+            border: none; border-radius: 6px; cursor: pointer; display: inline-flex;
+            align-items: center; gap: 5px;
+        }
+        .btn-calc { background-color: #3874a7; }
+        .btn-export { background-color: #10b981; } 
+        .btn-clear { background-color: #f39c12; }
+        .btn-setting { background-color: #718096; }
+
+        .table-responsive { overflow-x: auto; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { border: 1px solid #eaedf1; padding: 10px 8px; text-align: center; font-size: 0.95rem; }
+        th { background-color: #f8fafc; font-weight: bold; color: #2d3748; }
+        .table-title { font-size: 0.95rem; color: #718096; margin-bottom: 8px; margin-top: 0; font-weight: bold; }
+
+        /* 模态框样式 */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background-color: #fff; padding: 25px; border-radius: 8px; width: 450px; max-height: 85vh; overflow-y: auto;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .modal-header { font-size: 1.2rem; font-weight: bold; color: #2d3748; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;}
+        .mat-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+        .mat-row input { flex: 1; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;}
+        .mat-actions { margin-top: 20px; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 1. 多规格芯线参数区 -->
+    <div class="card">
+        <div class="module-title">
+            <span>输入芯线工艺参数 (支持多规格混绞/并排)</span>
+        </div>
+        <div id="cores-container"></div>
+        <button class="btn-add-core" onclick="addCoreBlock()">+ 添加芯线规格</button>
+    </div>
+
+    <!-- 2. 外被与成缆参数区 -->
+    <div class="card">
+        <h3 class="module-title">成品外观与包胶参数</h3>
+        <div class="input-grid">
+            <div class="input-item" style="border-right: 2px dashed #cbd5e0; padding-right: 15px;">
+                <label style="color: #e53e3e;">线材外观形状</label>
+                <select id="cable_shape" onchange="toggleShapeSettings()" style="font-weight: bold;">
+                    <option value="round">圆形线 (圆整绞合)</option>
+                    <option value="flat">扁平线 (跑道型并排)</option>
+                </select>
+            </div>
+            <div class="input-item">
+                <label>外被包胶厚度 (mm)</label>
+                <input type="number" id="jack_thick" step="0.01" value="0.4">
+            </div>
+            <div class="input-item">
+                <label>外被材质</label>
+                <select id="jack_mat"></select>
+            </div>
+            <div class="input-item">
+                <label>外被填充(补强丝)</label>
+                <input type="text" id="jack_filler" placeholder="例: 1000D Kailev">
+            </div>
+            <div class="input-item" id="lay_mult_container">
+                <label>成缆绞距倍数</label>
+                <input type="number" id="cab_lay_mult" step="0.1" value="40">
+            </div>
+            <div class="input-item" id="flat_spacing_container" style="display: none;">
+                <label style="color: #2b6cb0;">芯线间距 (mm)</label>
+                <input type="number" id="flat_spacing" step="0.01" value="0" placeholder="间隙">
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 操作按钮区 -->
+    <div class="card action-bar">
+        <button class="btn btn-calc" onclick="calculateAll()">⚡ 计算更新</button>
+        <button class="btn btn-export" onclick="exportToExcelForm()">📥 导出工程表单(Excel)</button>
+        <button class="btn btn-setting" onclick="openMatModal()">⚙️ 胶料材质设置</button>
+        <button class="btn btn-clear" onclick="clearAll()">🔄 清空数据</button>
+    </div>
+
+    <!-- 4. 计算结果区 -->
+    <div class="card">
+        <h3 class="module-title" style="border-left-color: #e53e3e;">计算结果 (本地查阅)</h3>
+        <h4 class="table-title">▶ 芯线各项明细</h4>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>规格编号</th><th>数量</th><th>导体外径(mm)</th><th>成型外径(mm)</th>
+                        <th>推荐绞距(mm)</th><th>单根铜丝(kg/m)</th><th>单根绝缘(kg/m)</th>
+                    </tr>
+                </thead>
+                <tbody id="result-core-tbody">
+                    <tr id="empty-row"><td colspan="7">请点击计算获取结果</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4 class="table-title" style="margin-top: 20px;">▶ 成品外观与外被汇总</h4>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>总芯数(N)</th><th id="th_cab_d">成缆/内部基准尺寸(mm)</th><th id="th_final_d">线材最终尺寸(mm)</th>
+                        <th>推荐成缆绞距(mm)</th><th>总铜丝(kg/m)</th><th>外被用量(kg/m)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="res_total_n">-</td><td id="res_cab_d">-</td><td id="res_final_d">-</td>
+                        <td id="res_cab_lay">-</td><td id="res_total_cu">-</td><td id="res_jack_w">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 胶料材质配置弹窗 -->
+<div id="mat_modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">⚙️ 胶料材质与密度配置</div>
+        <div style="font-size: 0.85rem; color: #718096; margin-bottom: 10px;">
+            (提示：自定义的胶料参数将自动保存在您的浏览器本地，下拉框会自动读取此列表)
+        </div>
+        <div id="mat_list_container">
+            <!-- JS动态渲染条目 -->
+        </div>
+        <div class="mat-actions">
+            <button class="btn-add-core" onclick="addMatRow('', '')">+ 新增一项胶料</button>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-clear" style="padding: 6px 15px;" onclick="closeMatModal()">取消</button>
+                <button class="btn-save" style="padding: 6px 15px;" onclick="saveMaterials()">保存设置</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const RHO_CU = 8.89; 
+    const K_LAY_CU = 1.02; 
+    const CABLING_FACTOR = [1.0, 1.0, 2.0, 2.154, 2.414, 2.7, 3.0, 3.0, 3.3, 3.6, 4.0];
+
+    // ==========================================
+    // 强关联的胶料材质系统
+    // ==========================================
+    let materials = JSON.parse(localStorage.getItem('wireMaterials')) || {
+        "PVC": 1.35, "TPE": 1.10, "TPEE": 1.20, "TPU": 1.20
+    };
+
+    // 动态生成 option 标签的 HTML，仅显示 材质(密度值)
+    function getMaterialOptionsHTML(defaultMat) {
+        let html = '';
+        for (let mat in materials) {
+            let selected = (mat === defaultMat) ? 'selected' : '';
+            html += `<option value="${mat}" ${selected}>${mat} (${materials[mat]})</option>`;
+        }
+        return html;
+    }
+
+    // 更新所有页面上现有的下拉框（保持当前选中项）
+    function updateAllSelects() {
+        // 更新外被材质下拉框
+        const jackSelect = document.getElementById('jack_mat');
+        const currentJack = jackSelect.value;
+        jackSelect.innerHTML = getMaterialOptionsHTML(currentJack || 'TPU');
+
+        // 更新所有动态生成的芯线绝缘材质下拉框
+        document.querySelectorAll('.core-ins-mat').forEach(select => {
+            const currentCore = select.value;
+            select.innerHTML = getMaterialOptionsHTML(currentCore || 'TPEE');
+        });
+    }
+    
+    // 弹窗管理
+    function openMatModal() {
+        const container = document.getElementById('mat_list_container');
+        container.innerHTML = '';
+        for (let mat in materials) {
+            addMatRow(mat, materials[mat]);
+        }
+        document.getElementById('mat_modal').style.display = 'flex';
+    }
+
+    function closeMatModal() {
+        document.getElementById('mat_modal').style.display = 'none';
+    }
+
+    function addMatRow(name, density) {
+        const container = document.getElementById('mat_list_container');
+        const div = document.createElement('div');
+        div.className = 'mat-row';
+        div.innerHTML = `
+            <input type="text" class="setting-mat-name" placeholder="胶料名称 (如 PVC)" value="${name}">
+            <input type="number" class="setting-mat-density" step="0.01" placeholder="密度值" value="${density}">
+            <button class="btn-small" onclick="this.parentElement.remove()">删除</button>
+        `;
+        container.appendChild(div);
+    }
+
+    function saveMaterials() {
+        const rows = document.querySelectorAll('.mat-row');
+        let newMaterials = {};
+        let valid = true;
+        rows.forEach(row => {
+            let name = row.querySelector('.setting-mat-name').value.trim();
+            let density = parseFloat(row.querySelector('.setting-mat-density').value);
+            if(name && !isNaN(density)) {
+                newMaterials[name] = density;
+            } else if (name || !isNaN(density)) {
+                valid = false;
+            }
+        });
+        
+        if(!valid) { alert("部分条目信息不全，请检查名称和密度！"); return; }
+        if(Object.keys(newMaterials).length === 0) { alert("至少保留一项胶料材质！"); return; }
+        
+        materials = newMaterials;
+        localStorage.setItem('wireMaterials', JSON.stringify(materials));
+        updateAllSelects(); // 保存后自动刷新所有下拉框
+        closeMatModal();
+    }
+
+
+    // ==========================================
+    // 业务计算与界面逻辑
+    // ==========================================
+    window.lastCalcData = null; 
+    let coreIndex = 0; 
+    
+    window.onload = function() { 
+        // 初始页面时，填充外被下拉框
+        document.getElementById('jack_mat').innerHTML = getMaterialOptionsHTML('TPU');
+        addCoreBlock(); 
+    };
+
+    function toggleShapeSettings() {
+        const shape = document.getElementById('cable_shape').value;
+        const layContainer = document.getElementById('lay_mult_container');
+        const spacingContainer = document.getElementById('flat_spacing_container');
+        if (shape === 'flat') {
+            layContainer.style.display = 'none';
+            spacingContainer.style.display = 'flex';
+        } else {
+            layContainer.style.display = 'flex';
+            spacingContainer.style.display = 'none';
+        }
+    }
+
+    function addCoreBlock() {
+        coreIndex++;
+        const container = document.getElementById('cores-container');
+        const div = document.createElement('div');
+        div.className = 'core-block';
+        div.id = 'core_block_' + coreIndex;
+        
+        div.innerHTML = `
+            <div class="core-header">
+                <span>芯线规格 ${coreIndex}</span>
+                ${coreIndex > 1 ? `<button class="btn-small" onclick="document.getElementById('core_block_${coreIndex}').remove()">删除该规格</button>` : ''}
+            </div>
+            <div class="core-input-row">
+                <div class="input-item"><label>单根铜直径(mm)</label><input type="number" class="core-cu-d" step="0.001"></div>
+                <div class="input-item"><label>铜丝股数(N)</label><input type="number" class="core-cu-n" step="1"></div>
+                <div class="input-item"><label>补强丝(Denier)</label><input type="number" class="core-yarn-d" step="1" value="0"></div>
+                <div class="input-item"><label>芯线绞距倍数</label><input type="number" class="core-lay-mult" step="0.1" value="8"></div>
+                <div class="input-item"><label>绝缘厚度(mm)</label><input type="number" class="core-ins-thick" step="0.01" value="0.25"></div>
+                <div class="input-item">
+                    <label>绝缘材质</label>
+                    <select class="core-ins-mat">
+                        ${getMaterialOptionsHTML('TPEE')}
+                    </select>
+                </div>
+                <div class="input-item" style="border-left: 2px solid #cbd5e0; padding-left: 10px;">
+                    <label style="color: #2b6cb0;">芯线数量</label>
+                    <input type="number" class="core-qty" step="1" value="1" min="1">
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    const getVal = (el, selector) => parseFloat(el.querySelector(selector).value) || 0;
+
+    function calculateAll() {
+        const coreBlocks = document.querySelectorAll('.core-block');
+        const shape = document.getElementById('cable_shape').value;
+        const jack_thick = parseFloat(document.getElementById('jack_thick').value) || 0;
+        
+        const jack_mat_name = document.getElementById('jack_mat').value;
+        const jack_mat = materials[jack_mat_name];
+        
+        if(!jack_mat) {
+            alert(`未找到外被材质参数，请刷新页面或重置字典！`); return false;
+        }
+        
+        const jack_filler = document.getElementById('jack_filler').value || '';
+
+        if (coreBlocks.length === 0 || jack_thick <= 0) {
+            alert("请输入完整的参数 (特别是外被包胶厚度)！"); return false;
+        }
+
+        let totalCoresN = 0, totalCuWeightKg = 0;
+        let sumD2_times_N = 0, sum_CoreWidths = 0, max_CoreThickness = 0, totalCoreArea_Actual = 0; 
+        let coreTableHTML = '';
+        let hasError = false;
+
+        let exportData = { cores: [], finalL: '', finalS: '', jackMatText: jack_mat_name, jackFiller: jack_filler, layCable: '' };
+
+        coreBlocks.forEach((block) => {
+            let cu_d = getVal(block, '.core-cu-d');
+            let cu_n = getVal(block, '.core-cu-n');
+            let yarn_d = getVal(block, '.core-yarn-d'); 
+            let lay_mult = getVal(block, '.core-lay-mult') || 8;
+            let ins_thick = getVal(block, '.core-ins-thick');
+            let qty = getVal(block, '.core-qty') || 1;
+            
+            let ins_mat_name = block.querySelector('.core-ins-mat').value;
+            let ins_mat = materials[ins_mat_name];
+            
+            if(!ins_mat) {
+                alert(`未找到芯线材质参数，请检查设置！`);
+                hasError = true; return;
+            }
+
+            if (cu_d <= 0 || cu_n <= 0 || ins_thick <= 0) { hasError = true; return; }
+
+            let areaCu = cu_n * (Math.PI / 4) * Math.pow(cu_d, 2);
+            let areaYarn = yarn_d > 0 ? (yarn_d / (9000 * 1.44)) * 0.1 : 0; 
+            
+            let condOD = 1.155 * Math.sqrt((4 * (areaCu + areaYarn)) / Math.PI);
+            let coreOD = condOD + 2 * ins_thick;
+            let layCond = condOD * lay_mult;
+            
+            let weightCuKg = (areaCu * RHO_CU * K_LAY_CU) / 1000;
+            let coreArea = (Math.PI / 4) * Math.pow(coreOD, 2);
+            let weightInsKg = ((coreArea - (Math.PI / 4) * Math.pow(condOD, 2)) * ins_mat) / 1000;
+
+            totalCoresN += qty;
+            totalCuWeightKg += (weightCuKg * qty);
+            totalCoreArea_Actual += (coreArea * qty);
+            sumD2_times_N += (Math.pow(coreOD, 2) * qty); 
+            sum_CoreWidths += (coreOD * qty);             
+            if (coreOD > max_CoreThickness) max_CoreThickness = coreOD; 
+
+            let specName = block.querySelector('.core-header span').innerText;
+            coreTableHTML += `
+                <tr>
+                    <td><strong>${specName}</strong></td><td>${qty}</td><td>${condOD.toFixed(3)}</td>
+                    <td style="color: #2b6cb0;">${coreOD.toFixed(3)}</td><td>${layCond.toFixed(1)}</td>
+                    <td>${weightCuKg.toFixed(4)}</td><td>${weightInsKg.toFixed(4)}</td>
+                </tr>
+            `;
+
+            let coreFillerText = yarn_d > 0 ? yarn_d + 'D' : '';
+            for(let i=0; i<qty; i++) {
+                exportData.cores.push({
+                    cu_d: cu_d.toFixed(3), 
+                    cu_n: cu_n, 
+                    layCond: layCond.toFixed(1), 
+                    insMatText: ins_mat_name, // 仅导出纯文字(如 PVC)
+                    filler: coreFillerText,      
+                    coreOD: coreOD.toFixed(3)
+                });
+            }
+        });
+
+        if (hasError) { return false; } 
+        document.getElementById('result-core-tbody').innerHTML = coreTableHTML;
+
+        let finalStr = '', baseStr = '', weightJackKg = 0, layCable = '-';
+
+        if (shape === 'round') {
+            document.getElementById('th_cab_d').innerText = "成缆外径评估(mm)";
+            document.getElementById('th_final_d').innerText = "成品圆线外径(mm)";
+            
+            let d_eff = Math.sqrt(sumD2_times_N / totalCoresN);
+            let k = (totalCoresN <= 10) ? CABLING_FACTOR[totalCoresN] : 1.15 * Math.sqrt(totalCoresN);
+            let cabOD = d_eff * k;
+            let finalOD = cabOD + 2 * jack_thick;
+            
+            baseStr = `Ø ${cabOD.toFixed(3)}`;
+            finalStr = `Ø ${finalOD.toFixed(3)}`;
+            weightJackKg = ((Math.PI / 4) * (Math.pow(finalOD, 2) - Math.pow(cabOD, 2)) * jack_mat) / 1000;
+            
+            let cab_lay = parseFloat(document.getElementById('cab_lay_mult').value) || 40;
+            layCable = (cabOD * cab_lay).toFixed(1);
+
+            exportData.finalL = finalOD.toFixed(2);
+            exportData.finalS = ""; 
+            exportData.layCable = layCable;
+
+        } else if (shape === 'flat') {
+            document.getElementById('th_cab_d').innerText = "内部排线宽×厚(mm)";
+            document.getElementById('th_final_d').innerText = "成品扁线宽×厚(mm)";
+            
+            let spacing = parseFloat(document.getElementById('flat_spacing').value) || 0;
+            let totalGapsWidth = totalCoresN > 1 ? (totalCoresN - 1) * spacing : 0;
+            
+            let W_in = sum_CoreWidths + totalGapsWidth;
+            let T_in = max_CoreThickness;
+            let W_out = W_in + 2 * jack_thick;
+            let T_out = T_in + 2 * jack_thick;
+            
+            baseStr = `${W_in.toFixed(2)} × ${T_in.toFixed(2)}`;
+            finalStr = `${W_out.toFixed(2)} × ${T_out.toFixed(2)}`;
+            let totalOutArea = (W_out - T_out) * T_out + (Math.PI / 4) * Math.pow(T_out, 2);
+            weightJackKg = ((totalOutArea - totalCoreArea_Actual) * jack_mat) / 1000;
+            layCable = "平行不绞";
+
+            exportData.finalL = W_out.toFixed(2);
+            exportData.finalS = T_out.toFixed(2);
+            exportData.layCable = layCable;
+        }
+
+        document.getElementById('res_total_n').innerText = totalCoresN;
+        document.getElementById('res_cab_d').innerText = baseStr;
+        document.getElementById('res_final_d').innerText = finalStr;
+        document.getElementById('res_cab_lay').innerText = layCable;
+        document.getElementById('res_total_cu').innerText = totalCuWeightKg.toFixed(4);
+        document.getElementById('res_jack_w').innerText = weightJackKg.toFixed(4);
+
+        window.lastCalcData = exportData;
+        return true;
+    }
+
+    function exportToExcelForm() {
+        if (!calculateAll() || !window.lastCalcData) return;
+        
+        const data = window.lastCalcData;
+        const dateStr = (new Date().getMonth() + 1) + '月' + new Date().getDate() + '日';
+
+        let html = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+            <meta charset="utf-8">
+            <style>
+                table { border-collapse: collapse; font-family: "Microsoft YaHei", sans-serif; font-size: 14px; }
+                th, td { border: 1px solid #000000; text-align: center; vertical-align: middle; padding: 5px; height: 35px; }
+                .bg-blue { background-color: #bdd7ee; }
+                .bg-orange { background-color: #f8cbad; }
+            </style>
+        </head>
+        <body>
+            <table>
+                <tr>
+                    <th rowspan="2" class="bg-blue">序号</th>
+                    <th rowspan="2" class="bg-blue">日期</th>
+                    <th rowspan="2" class="bg-blue">项目号</th>
+                    <th rowspan="2" class="bg-blue" style="width: 250px;">项目线材要求</th>
+                    <th colspan="2" class="bg-blue">尺寸</th>
+                    <th colspan="3" class="bg-orange">外被</th>
+                    <th colspan="3" class="bg-blue">中被</th>
+                    <th rowspan="2" class="bg-blue">芯线绞合<br>绞距</th>
+        `;
+
+        data.cores.forEach((core, i) => {
+            let colorClass = (i % 2 === 0) ? 'bg-orange' : 'bg-blue'; 
+            html += `<th colspan="8" class="${colorClass}">芯线${i+1}</th>`;
+        });
+
+        html += `</tr><tr>
+                    <th class="bg-blue">长径</th>
+                    <th class="bg-blue">短径</th>
+                    <th class="bg-orange">材质</th>
+                    <th class="bg-orange">颜色</th>
+                    <th class="bg-orange">填充</th>
+                    <th class="bg-blue">材质</th>
+                    <th class="bg-blue">颜色</th>
+                    <th class="bg-blue">填充</th>
+        `;
+
+        data.cores.forEach((core, i) => {
+            let colorClass = (i % 2 === 0) ? 'bg-orange' : 'bg-blue';
+            html += `
+                    <th class="${colorClass}">铜材质</th>
+                    <th class="${colorClass}">规格</th>
+                    <th class="${colorClass}">支数</th>
+                    <th class="${colorClass}">填充</th>
+                    <th class="${colorClass}">绝缘</th>
+                    <th class="${colorClass}">颜色</th>
+                    <th class="${colorClass}">绞距</th>
+                    <th class="${colorClass}">ID</th>
+            `;
+        });
+
+        html += `</tr><tr>
+                    <td>1</td>
+                    <td>${dateStr}</td>
+                    <td></td>
+                    <td></td>
+                    <td>${data.finalL}</td>
+                    <td>${data.finalS}</td>
+                    <td>${data.jackMatText}</td>
+                    <td></td>
+                    <td>${data.jackFiller}</td>
+                    <td></td><td></td><td></td> 
+                    <td>${data.layCable}</td>
+        `;
+
+        data.cores.forEach(core => {
+            html += `
+                    <td></td>
+                    <td>${core.cu_d}</td>
+                    <td>${core.cu_n}</td>
+                    <td>${core.filler}</td>
+                    <td>${core.insMatText}</td>
+                    <td></td>
+                    <td>${core.layCond}</td>
+                    <td>${core.coreOD}</td>
+            `;
+        });
+
+        html += `</tr></table></body></html>`;
+
+        const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        const timestamp = new Date().toISOString().slice(0,10).replace(/-/g, "");
+        link.setAttribute("download", `项目线材工艺明细表_${timestamp}.xls`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+</body>
+</html>
