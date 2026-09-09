@@ -224,11 +224,11 @@
                 <thead>
                     <tr>
                         <th>规格编号</th><th>数量</th><th>导体外径(mm)</th><th>成型外径(mm)</th>
-                        <th>推荐绞距(mm)</th><th>单根铜丝(kg/m)</th><th>单根绝缘(kg/m)</th>
+                        <th>推荐绞距(mm)</th><th>单根铜丝(kg/m)</th><th>单根绝缘(kg/m)</th><th>胶料总量(kg/m)</th>
                     </tr>
                 </thead>
                 <tbody id="result-core-tbody">
-                    <tr id="empty-row"><td colspan="7">请点击计算获取结果</td></tr>
+                    <tr id="empty-row"><td colspan="8">请点击计算获取结果</td></tr>
                 </tbody>
             </table>
         </div>
@@ -500,7 +500,7 @@
                 <tr>
                     <td><strong>${specName}</strong></td><td>${qty}</td><td>${condOD.toFixed(3)}</td>
                     <td style="color: #2b6cb0;">${coreOD.toFixed(3)}</td><td>${layCond.toFixed(1)}</td>
-                    <td>${weightCuKg.toFixed(4)}</td><td>${weightInsKg.toFixed(4)}</td>
+                    <td>${weightCuKg.toFixed(4)}</td><td>${weightInsKg.toFixed(4)}</td><td>${(weightInsKg * qty).toFixed(4)}</td>
                 </tr>
             `;
 
@@ -584,7 +584,7 @@
         document.getElementById('flat_spacing').value = '0';
         document.getElementById('cable_shape').value = 'round';
         toggleShapeSettings();
-        document.getElementById('result-core-tbody').innerHTML = '<tr id="empty-row"><td colspan="7">请点击计算获取结果</td></tr>';
+        document.getElementById('result-core-tbody').innerHTML = '<tr id="empty-row"><td colspan="8">请点击计算获取结果</td></tr>';
         ['res_total_n','res_cab_d','res_final_d','res_cab_lay','res_total_cu','res_jack_w'].forEach(id => document.getElementById(id).innerText = '-');
     }
 
