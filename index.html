@@ -2,15 +2,13 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>线材工艺计算工具-v1.0</title>
+    <title>线材工艺计算工具 -v1.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- PWA / 应用图标 -->
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
     <meta name="theme-color" content="#3874a7">
-    <meta name="description" content="USB/数据线材工艺参数核算工具：多规格芯线混绞、圆线/扁线尺寸与胶料用量计算、工程表单导出">
     <style>
         body {
             font-family: 'Segoe UI', "Microsoft YaHei", sans-serif;
@@ -89,22 +87,13 @@
         }
         .core-input-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(7, 1fr);
             gap: 12px;
-            align-items: flex-end;
+            align-items: flex-end; 
         }
         @media (max-width: 1000px) {
-            .core-input-row { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
-            .core-input-row .input-item { min-width: 0; }
-            .input-item label { font-size: 0.7rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-            .input-item input, .input-item select { font-size: 0.85rem; padding: 6px 4px; }
-            /* 移动端折行后隐藏分隔竖线，避免错位 */
-            .input-item-sep { border-left: none; padding-left: 0; }
-        }
-        /* 桌面宽屏：末列(芯线数量)左侧分隔竖线 */
-        .input-item-sep {
-            border-left: 2px solid #cbd5e0;
-            padding-left: 10px;
+            .core-input-row { overflow-x: auto; padding-bottom: 5px; }
+            .core-input-row .input-item { min-width: 130px; }
         }
 
         .input-item { display: flex; flex-direction: column; gap: 6px; }
@@ -164,17 +153,17 @@
 
     <!-- 2. 外被与成缆参数区 -->
     <div class="card">
-        <h3 class="module-title">线材成品参数</h3>
+        <h3 class="module-title">成品外观与包胶参数</h3>
         <div class="input-grid">
             <div class="input-item" style="border-right: 2px dashed #cbd5e0; padding-right: 15px;">
-                <label style="color: #e53e3e;">线材类型</label>
+                <label style="color: #e53e3e;">线材外观形状</label>
                 <select id="cable_shape" onchange="toggleShapeSettings()" style="font-weight: bold;">
-                    <option value="round">圆线</option>
-                    <option value="flat">扁线</option>
+                    <option value="round">圆形线 (圆整绞合)</option>
+                    <option value="flat">扁平线 (跑道型并排)</option>
                 </select>
             </div>
             <div class="input-item">
-                <label>外包胶(单边) (mm)</label>
+                <label>外被包胶厚度 (mm)</label>
                 <input type="number" id="jack_thick" step="0.01" value="0.4">
             </div>
             <div class="input-item">
@@ -182,7 +171,7 @@
                 <select id="jack_mat"></select>
             </div>
             <div class="input-item">
-                <label>补强丝</label>
+                <label>外被填充(补强丝)</label>
                 <input type="text" id="jack_filler" placeholder="例: 1000D Kailev">
             </div>
             <div class="input-item" id="lay_mult_container">
@@ -386,18 +375,18 @@
                 ${coreIndex > 1 ? `<button class="btn-small" onclick="document.getElementById('core_block_${coreIndex}').remove()">删除该规格</button>` : ''}
             </div>
             <div class="core-input-row">
-                <div class="input-item"><label>铜直径(mm)</label><input type="number" class="core-cu-d" step="0.001"></div>
-                <div class="input-item"><label>股数(N)</label><input type="number" class="core-cu-n" step="1"></div>
+                <div class="input-item"><label>单根铜直径(mm)</label><input type="number" class="core-cu-d" step="0.001"></div>
+                <div class="input-item"><label>铜丝股数(N)</label><input type="number" class="core-cu-n" step="1"></div>
                 <div class="input-item"><label>补强丝(Denier)</label><input type="number" class="core-yarn-d" step="1" value="0"></div>
-                <div class="input-item"><label>绞距倍数</label><input type="number" class="core-lay-mult" step="0.1" value="8"></div>
-                <div class="input-item"><label>胶厚(mm)</label><input type="number" class="core-ins-thick" step="0.01" value="0.25"></div>
+                <div class="input-item"><label>芯线绞距倍数</label><input type="number" class="core-lay-mult" step="0.1" value="8"></div>
+                <div class="input-item"><label>绝缘厚度(mm)</label><input type="number" class="core-ins-thick" step="0.01" value="0.25"></div>
                 <div class="input-item">
                     <label>绝缘材质</label>
                     <select class="core-ins-mat">
                         ${getMaterialOptionsHTML('TPEE')}
                     </select>
                 </div>
-                <div class="input-item input-item-sep">
+                <div class="input-item" style="border-left: 2px solid #cbd5e0; padding-left: 10px;">
                     <label style="color: #2b6cb0;">芯线数量</label>
                     <input type="number" class="core-qty" step="1" value="1" min="1">
                 </div>
@@ -548,6 +537,20 @@
 
         window.lastCalcData = exportData;
         return true;
+    }
+
+    function clearAll() {
+        document.getElementById('cores-container').innerHTML = '';
+        coreIndex = 0;
+        addCoreBlock();
+        document.getElementById('jack_thick').value = '0.4';
+        document.getElementById('jack_filler').value = '';
+        document.getElementById('cab_lay_mult').value = '40';
+        document.getElementById('flat_spacing').value = '0';
+        document.getElementById('cable_shape').value = 'round';
+        toggleShapeSettings();
+        document.getElementById('result-core-tbody').innerHTML = '<tr id="empty-row"><td colspan="7">请点击计算获取结果</td></tr>';
+        ['res_total_n','res_cab_d','res_final_d','res_cab_lay','res_total_cu','res_jack_w'].forEach(id => document.getElementById(id).innerText = '-');
     }
 
     function exportToExcelForm() {
