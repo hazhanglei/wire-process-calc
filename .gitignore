@@ -3,3 +3,5 @@
 *.bak
 # gh api 临时请求体
 pages.json
+# 测试残留日志
+deploy_test.log

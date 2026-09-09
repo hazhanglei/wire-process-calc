@@ -1,0 +1,17 @@
+{
+  "name": "线材工艺计算工具-v1.0",
+  "short_name": "线材计算",
+  "description": "USB/数据线材工艺参数核算：多规格芯线混绞、圆线/扁线尺寸与胶料用量计算、工程表单导出",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#3b3b3b",
+  "theme_color": "#3874a7",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
